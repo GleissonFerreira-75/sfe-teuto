@@ -130,6 +130,13 @@
         .form-group input,.form-group select,.form-group textarea{background:#0f172a;border:1px solid var(--border);color:var(--text);padding:10px 14px;border-radius:8px;font-size:13px;outline:none;width:100%;transition:border-color .2s;}
         .form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--accent);}
         .form-group input[readonly]{opacity:.7;cursor:default;}.form-group textarea{resize:vertical;font-family:'Inter',sans-serif;}
+        /* Tooltip de info nos campos */
+        .field-label-row{display:flex;align-items:center;gap:6px;}
+        .info-icon{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;background:transparent;border:1px solid var(--subtitle);color:var(--subtitle);font-size:9px;font-weight:800;cursor:default;position:relative;flex-shrink:0;transition:border-color .2s,color .2s;line-height:1;font-style:normal;}
+        .info-icon:hover{border-color:var(--accent);color:var(--accent);}
+        .info-icon .tooltip-text{visibility:hidden;opacity:0;position:absolute;left:50%;bottom:calc(100% + 8px);transform:translateX(-50%);background:#1e293b;color:var(--text);font-size:11px;font-weight:400;text-transform:none;letter-spacing:0;line-height:1.55;padding:10px 14px;border-radius:8px;border:1px solid var(--border);width:320px;white-space:normal;pointer-events:none;transition:opacity .18s;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,.5);}
+        .info-icon .tooltip-text::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:6px solid transparent;border-top-color:#1e293b;}
+        .info-icon:hover .tooltip-text{visibility:visible;opacity:1;}
         .modal-actions{display:flex;gap:12px;margin-top:22px;justify-content:center;}
         .btn-save{width:160px;padding:14px;background:var(--success);color:white;border:none;border-radius:8px;font-size:13px;font-weight:800;text-transform:uppercase;cursor:pointer;transition:opacity .2s;}
         .btn-save:disabled{opacity:.35;cursor:not-allowed;}.btn-save:not(:disabled):hover{opacity:.85;}
@@ -458,8 +465,8 @@
             </div>
             <div class="form-group"><label>Nome do Contato</label><input type="text" id="v-contato-nome" autocomplete="off" oninput="validateSaveBtn()"></div>
             <div class="form-group"><label>Cargo do Contato</label><input type="text" id="v-contato-cargo" autocomplete="off" oninput="validateSaveBtn()"></div>
-            <div class="form-group full-width"><label>Comentários da Visita</label><textarea id="v-comentario" style="height:70px" oninput="validateSaveBtn()"></textarea></div>
-            <div class="form-group full-width"><label>Objetivo da Próxima Visita</label><textarea id="v-proximo" style="height:70px" oninput="validateSaveBtn()"></textarea></div>
+            <div class="form-group full-width"><label><span class="field-label-row">Comentários da Visita<i class="info-icon">i<span class="tooltip-text">Registre de forma objetiva e organizada os principais temas abordados durante a visita, incluindo necessidades do cliente, alinhamentos realizados, oportunidades discutidas, decisões tomadas, percepções relevantes, feedbacks compartilhados, possíveis riscos ou dificuldades observadas e os próximos passos definidos durante a reunião.</span></i></span></label><textarea id="v-comentario" style="height:70px" oninput="validateSaveBtn()"></textarea></div>
+            <div class="form-group full-width"><label><span class="field-label-row">Objetivo da Próxima Visita<i class="info-icon">i<span class="tooltip-text">Descreva os principais objetivos e ações previstas para a próxima visita, como revisão de resultados, acompanhamento de pendências e oportunidades, definição de novas ações comerciais, apresentação de produtos, evolução de negociações ou fortalecimento do relacionamento com o cliente.</span></i></span></label><textarea id="v-proximo" style="height:70px" oninput="validateSaveBtn()"></textarea></div>
         </div>
         <div class="modal-actions">
             <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
@@ -627,8 +634,8 @@
                 <div class="mn-fi"><span class="mn-fb mn-req">Obrigatório</span><div><div class="mn-fn">Modalidade</div><div class="mn-fd"><strong>Presencial</strong> : no local. <strong>Virtual</strong> : por videochamada ou telefone.</div></div></div>
                 <div class="mn-fi"><span class="mn-fb mn-req">Obrigatório</span><div><div class="mn-fn">Visita Acompanhada?</div><div class="mn-fd">"Sim" habilita o campo <strong>Cargo do Acompanhante</strong>, que também se torna obrigatório.</div></div></div>
                 <div class="mn-fi"><span class="mn-fb mn-req">Obrigatório</span><div><div class="mn-fn">Nome e Cargo do Contato</div><div class="mn-fd">Pessoa reunida e sua função (ex.: Gerente de Compras, Farmacêutico).</div></div></div>
-                <div class="mn-fi"><span class="mn-fb mn-req">Obrigatório</span><div><div class="mn-fn">Comentários da Visita</div><div class="mn-fd">Registre de forma clara e objetiva os principais assuntos tratados durante a visita, incluindo necessidades identificadas, alinhamentos realizados, decisões tomadas, percepções do cliente e informações importantes para acompanhamento futuro.</div></div></div>
-                <div class="mn-fi"><span class="mn-fb mn-req">Obrigatório</span><div><div class="mn-fn">Objetivo da Próxima Visita</div><div class="mn-fd">Descreva os objetivos e ações planejadas para a próxima visita, como revisão de resultados, retorno de pendências, acompanhamento de oportunidades, definição de novas ações comerciais, apresentação de produtos ou fortalecimento do relacionamento com o cliente.</div></div></div>
+                <div class="mn-fi"><span class="mn-fb mn-req">Obrigatório</span><div><div class="mn-fn">Comentários da Visita</div><div class="mn-fd">Registre de forma objetiva e organizada os principais temas abordados durante a visita, incluindo necessidades do cliente, alinhamentos realizados, oportunidades discutidas, decisões tomadas, percepções relevantes, feedbacks compartilhados, possíveis riscos ou dificuldades observadas e os próximos passos definidos durante a reunião.</div></div></div>
+                <div class="mn-fi"><span class="mn-fb mn-req">Obrigatório</span><div><div class="mn-fn">Objetivo da Próxima Visita</div><div class="mn-fd">Descreva os principais objetivos e ações previstas para a próxima visita, como revisão de resultados, acompanhamento de pendências e oportunidades, definição de novas ações comerciais, apresentação de produtos, evolução de negociações ou fortalecimento do relacionamento com o cliente.</div></div></div>
             </div>
             <div class="mn-call mn-tip"><div class="mn-ci">💡</div><div class="mn-ct"><strong>Cliente errado?</strong> Clique em <strong>"↺ Alterar Cliente"</strong> para limpar e recomeçar.</div></div>
             <div class="mn-call mn-warn"><div class="mn-ci">⚠️</div><div class="mn-ct"><strong>SALVAR só é habilitado</strong> quando todos os campos obrigatórios estão preenchidos.</div></div>

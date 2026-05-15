@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-br"><head>
+<html lang="pt-br" style=""><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
@@ -1117,14 +1117,47 @@ async function confirmarEnvio(){
     /* AbortController: cancela o fetch após 35s (margem para cold start do Apps Script) */
     var controller=new AbortController(), timeoutId=setTimeout(function(){controller.abort();},35000);
     try{
-        var resp=await fetch(window.CLONE_SCRIPT_URL,{method:'POST',body:JSON.stringify({rows:rows}),signal:controller.signal}), json=await resp.json();
+        var resp=await fetch(window.CLONE_SCRIPT_URL,{method:'POST',body:JSON.stringify({rows:rows}),signal:controller.signal});
         clearTimeout(timeoutId);
-        if(json.status==='ok'){fb.className='send-feedback success';fb.innerHTML='✓ '+json.inserted+' registro(s) enviado(s) com sucesso!';setTimeout(function(){confirmClear();fb.className='send-feedback';fb.innerHTML='';},2500);}
-        else{throw new Error(json.message||'Erro desconhecido');}
+        /* Mapeia erros HTTP do Apps Script para mensagens orientadas à ação */
+        if(!resp.ok){
+            var httpMsgs={
+                400:'Dados inválidos (erro 400). Verifique os registros e tente novamente.',
+                401:'Acesso não autorizado (erro 401). Contate o administrador.',
+                403:'Sem permissão para enviar (erro 403). O link do sistema pode estar desatualizado — contate o administrador.',
+                429:'Muitas requisições simultâneas (erro 429). Aguarde 1 minuto e tente novamente.',
+                500:'Erro interno no servidor (erro 500). Tente novamente em alguns instantes.',
+                502:'Serviço temporariamente indisponível (erro 502). Tente novamente em alguns instantes.',
+                503:'Serviço em manutenção (erro 503). Tente novamente mais tarde ou contate o administrador.'
+            };
+            throw new Error(httpMsgs[resp.status]||'Erro HTTP '+resp.status+'. Tente novamente ou contate o administrador.');
+        }
+        var json=await resp.json();
+        if(json.status==='ok'){
+            fb.className='send-feedback success';fb.innerHTML='✓ '+json.inserted+' registro(s) enviado(s) com sucesso!';
+            setTimeout(function(){confirmClear();fb.className='send-feedback';fb.innerHTML='';},2500);
+        } else {
+            /* Mapeia erros semânticos retornados pelo Apps Script */
+            var appMsgs={
+                'quota_exceeded':'Cota de escrita da planilha atingida. Aguarde alguns minutos e tente novamente.',
+                'sheet_not_found':'Planilha de destino não encontrada. Contate o administrador.',
+                'permission_denied':'Sem permissão para gravar na planilha. Contate o administrador.',
+                'invalid_data':'Dados recusados pela planilha. Verifique os registros e tente novamente.'
+            };
+            var errCode=json.code||'';
+            throw new Error(appMsgs[errCode]||(json.message&&json.message!=='Erro desconhecido'?json.message:'Falha no processamento. Tente novamente ou contate o administrador.'));
+        }
     }catch(err){
         clearTimeout(timeoutId);
-        var msg=err.name==='AbortError'?'Tempo limite excedido (35s). Verifique sua conexão e tente novamente.':err.message;
-        fb.className='send-feedback error';fb.innerHTML='✕ Falha: '+msg;btn.disabled=false;
+        var msg;
+        if(err.name==='AbortError'){
+            msg='Tempo limite excedido (35s). Verifique sua conexão com a internet e tente novamente.';
+        } else if(err.name==='TypeError'&&err.message.toLowerCase().includes('fetch')){
+            msg='Sem conexão com a internet. Verifique o Wi-Fi ou os dados móveis e tente novamente.';
+        } else {
+            msg=err.message||'Falha inesperada. Tente novamente ou contate o administrador.';
+        }
+        fb.className='send-feedback error';fb.innerHTML='✕ '+msg;btn.disabled=false;
     }
 }
 

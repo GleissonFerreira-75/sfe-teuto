@@ -334,7 +334,7 @@
         <div class="ruler-container" id="ruler"><div class="time-marker is-hour" style="left: 0%;"><div class="tick-bar"></div><div class="time-label">08:00</div></div><div class="time-marker" style="left: 2.5%;"><div class="tick-bar"></div><div class="time-label">08:15</div></div><div class="time-marker" style="left: 5%;"><div class="tick-bar"></div><div class="time-label">08:30</div></div><div class="time-marker" style="left: 7.5%;"><div class="tick-bar"></div><div class="time-label">08:45</div></div><div class="time-marker is-hour" style="left: 10%;"><div class="tick-bar"></div><div class="time-label">09:00</div></div><div class="time-marker" style="left: 12.5%;"><div class="tick-bar"></div><div class="time-label">09:15</div></div><div class="time-marker" style="left: 15%;"><div class="tick-bar"></div><div class="time-label">09:30</div></div><div class="time-marker" style="left: 17.5%;"><div class="tick-bar"></div><div class="time-label">09:45</div></div><div class="time-marker is-hour" style="left: 20%;"><div class="tick-bar"></div><div class="time-label">10:00</div></div><div class="time-marker" style="left: 22.5%;"><div class="tick-bar"></div><div class="time-label">10:15</div></div><div class="time-marker" style="left: 25%;"><div class="tick-bar"></div><div class="time-label">10:30</div></div><div class="time-marker" style="left: 27.5%;"><div class="tick-bar"></div><div class="time-label">10:45</div></div><div class="time-marker is-hour" style="left: 30%;"><div class="tick-bar"></div><div class="time-label">11:00</div></div><div class="time-marker" style="left: 32.5%;"><div class="tick-bar"></div><div class="time-label">11:15</div></div><div class="time-marker" style="left: 35%;"><div class="tick-bar"></div><div class="time-label">11:30</div></div><div class="time-marker" style="left: 37.5%;"><div class="tick-bar"></div><div class="time-label">11:45</div></div><div class="time-marker is-hour" style="left: 40%;"><div class="tick-bar"></div><div class="time-label">12:00</div></div><div class="time-marker" style="left: 42.5%;"><div class="tick-bar"></div><div class="time-label">12:15</div></div><div class="time-marker" style="left: 45%;"><div class="tick-bar"></div><div class="time-label">12:30</div></div><div class="time-marker" style="left: 47.5%;"><div class="tick-bar"></div><div class="time-label">12:45</div></div><div class="time-marker is-hour" style="left: 50%;"><div class="tick-bar"></div><div class="time-label">13:00</div></div><div class="time-marker" style="left: 52.5%;"><div class="tick-bar"></div><div class="time-label">13:15</div></div><div class="time-marker" style="left: 55%;"><div class="tick-bar"></div><div class="time-label">13:30</div></div><div class="time-marker" style="left: 57.5%;"><div class="tick-bar"></div><div class="time-label">13:45</div></div><div class="time-marker is-hour" style="left: 60%;"><div class="tick-bar"></div><div class="time-label">14:00</div></div><div class="time-marker" style="left: 62.5%;"><div class="tick-bar"></div><div class="time-label">14:15</div></div><div class="time-marker" style="left: 65%;"><div class="tick-bar"></div><div class="time-label">14:30</div></div><div class="time-marker" style="left: 67.5%;"><div class="tick-bar"></div><div class="time-label">14:45</div></div><div class="time-marker is-hour" style="left: 70%;"><div class="tick-bar"></div><div class="time-label">15:00</div></div><div class="time-marker" style="left: 72.5%;"><div class="tick-bar"></div><div class="time-label">15:15</div></div><div class="time-marker" style="left: 75%;"><div class="tick-bar"></div><div class="time-label">15:30</div></div><div class="time-marker" style="left: 77.5%;"><div class="tick-bar"></div><div class="time-label">15:45</div></div><div class="time-marker is-hour" style="left: 80%;"><div class="tick-bar"></div><div class="time-label">16:00</div></div><div class="time-marker" style="left: 82.5%;"><div class="tick-bar"></div><div class="time-label">16:15</div></div><div class="time-marker" style="left: 85%;"><div class="tick-bar"></div><div class="time-label">16:30</div></div><div class="time-marker" style="left: 87.5%;"><div class="tick-bar"></div><div class="time-label">16:45</div></div><div class="time-marker is-hour" style="left: 90%;"><div class="tick-bar"></div><div class="time-label">17:00</div></div><div class="time-marker" style="left: 92.5%;"><div class="tick-bar"></div><div class="time-label">17:15</div></div><div class="time-marker" style="left: 95%;"><div class="tick-bar"></div><div class="time-label">17:30</div></div><div class="time-marker" style="left: 97.5%;"><div class="tick-bar"></div><div class="time-label">17:45</div></div><div class="time-marker is-hour" style="left: 100%;"><div class="tick-bar"></div><div class="time-label">18:00</div></div></div>
         <button class="tl-btn left" onclick="openConfirmClear()">Limpar Atividades</button>
         
-        <button class="tl-btn right2" onclick="openManual()">📖 Manual</button>
+        <button class="tl-btn right2" onclick="openManual()">Manual</button>
     </div>
 </main>
 
@@ -800,16 +800,15 @@ async function processFiles() {
         sel.onchange = function() { updateTable(); };
         st.textContent = 'Lendo Cadastro de Clientes...';
         var clientes = await readXlsx(_fileClientes);
-        /* LOGIC-06: valida colunas obrigatórias no Excel de clientes */
-        if (clientes.length > 0) {
-            var primeiraLinha = clientes[0];
-            var temRazao  = 'RAZÃO SOCIAL' in primeiraLinha || 'RAZAO SOCIAL' in primeiraLinha;
-            var temCNPJ   = 'CNPJ' in primeiraLinha;
-            var faltando  = [];
-            if (!temCNPJ)  faltando.push('CNPJ');
-            if (!temRazao) faltando.push('RAZÃO SOCIAL');
-            if (faltando.length) throw new Error('Planilha de clientes sem coluna(s) obrigatória(s): ' + faltando.join(', ') + '. Verifique o cabeçalho do arquivo.');
-        }
+        /* LOGIC-06: valida colunas obrigatórias — cobre também planilha só com cabeçalho (length===0) */
+        if (clientes.length === 0) throw new Error('Planilha de clientes está vazia. Verifique se há dados além do cabeçalho.');
+        var primeiraLinha = clientes[0];
+        var temRazao  = 'RAZÃO SOCIAL' in primeiraLinha || 'RAZAO SOCIAL' in primeiraLinha;
+        var temCNPJ   = 'CNPJ' in primeiraLinha;
+        var faltando  = [];
+        if (!temCNPJ)  faltando.push('CNPJ');
+        if (!temRazao) faltando.push('RAZÃO SOCIAL');
+        if (faltando.length) throw new Error('Planilha de clientes sem coluna(s) obrigatória(s): ' + faltando.join(', ') + '. Verifique o cabeçalho do arquivo.');
         /* PERF-02: normaliza campos de busca uma vez na carga, não a cada keystroke */
         CLIENT_DB = clientes.map(function(row) {
             var cnpj    = String(row['CNPJ']||'').trim().replace(/\D/g,'').padStart(14,'0');
@@ -1063,7 +1062,8 @@ function debouncedSearch(val) {
     _searchTimer = setTimeout(function(){ searchClient(val); }, 180);
 }
 
-function highlightText(text,q){if(!q)return String(text);var esc=q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');return String(text).replace(new RegExp('('+esc+')','gi'),'<span class="match-highlight">$1</span>');}
+/* PERF-04: aceita RegExp pré-compilada para evitar recompilar 300x por busca */
+function highlightText(text,re){if(!re)return String(text);return String(text).replace(re,'<span class="match-highlight">$1</span>');}
 function searchClient(q){
     var wrap=document.getElementById('client-results-wrap'),tbody=document.getElementById('client-results-body'),noRes=document.getElementById('no-results-msg');
     var term=q.trim().toLowerCase(); if(term.length<2){wrap.style.display='none';return;}
@@ -1071,11 +1071,15 @@ function searchClient(q){
     var list=CLIENT_DB.filter(function(c){ return c._search ? c._search.includes(term) : (c.cnpj+' '+c.razao+' '+c.endereco+' '+c.bairro+' '+c.cidade+' '+c.uf).toLowerCase().includes(term); }).slice(0,50);
     tbody.innerHTML=''; noRes.style.display='none';
     if(!list.length){noRes.style.display='block';wrap.style.display='block';return;}
+    /* PERF-04: compila o RegExp uma única vez para todos os 50 resultados × 6 campos */
+    var re = null;
+    try { var esc=q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'); re=new RegExp('('+esc+')','gi'); } catch(e){}
+    var frag=document.createDocumentFragment();
     list.forEach(function(c){
         var tr=document.createElement('tr');
-        tr.innerHTML='<td>'+highlightText(c.cnpj,q)+'</td><td>'+highlightText(c.razao,q)+'</td><td>'+highlightText(c.endereco,q)+'</td><td>'+highlightText(c.bairro,q)+'</td><td>'+highlightText(c.cidade,q)+'</td><td>'+highlightText(c.uf,q)+'</td>';
-        tr.addEventListener('click',function(){selectClient(c);}); tbody.appendChild(tr);
-    }); wrap.style.display='block';
+        tr.innerHTML='<td>'+highlightText(c.cnpj,re)+'</td><td>'+highlightText(c.razao,re)+'</td><td>'+highlightText(c.endereco,re)+'</td><td>'+highlightText(c.bairro,re)+'</td><td>'+highlightText(c.cidade,re)+'</td><td>'+highlightText(c.uf,re)+'</td>';
+        tr.addEventListener('click',function(){selectClient(c);}); frag.appendChild(tr);
+    }); tbody.appendChild(frag); wrap.style.display='block';
 }
 function renderSelectedCard(c){document.getElementById('sc-razao').textContent=c.razao;document.getElementById('sc-cnpj').textContent=c.cnpj;document.getElementById('sc-end').textContent=c.endereco;document.getElementById('sc-bairro').textContent=c.bairro;document.getElementById('sc-cidade').textContent=c.cidade;document.getElementById('sc-uf').textContent=c.uf;}
 function selectClient(c){selectedClient=c;renderSelectedCard(c);showClientCard();validateSaveBtn();}
@@ -1115,7 +1119,7 @@ async function confirmarEnvio(){
     try{
         var resp=await fetch(window.CLONE_SCRIPT_URL,{method:'POST',body:JSON.stringify({rows:rows}),signal:controller.signal}), json=await resp.json();
         clearTimeout(timeoutId);
-        if(json.status==='ok'){fb.className='send-feedback success';fb.innerHTML='✓ '+json.inserted+' registro(s) enviado(s) com sucesso!';setTimeout(function(){confirmClear();fb.className='send-feedback';fb.innerHTML='';updateTable();},2500);}
+        if(json.status==='ok'){fb.className='send-feedback success';fb.innerHTML='✓ '+json.inserted+' registro(s) enviado(s) com sucesso!';setTimeout(function(){confirmClear();fb.className='send-feedback';fb.innerHTML='';},2500);}
         else{throw new Error(json.message||'Erro desconhecido');}
     }catch(err){
         clearTimeout(timeoutId);
@@ -1143,7 +1147,9 @@ function exportCSV(){
         return(s.includes(';')||s.includes('\n')||s.includes('"'))?'"'+s+'"':s;
     }
     var blob=new Blob(['\uFEFF'+rows.map(function(r){return r.map(esc).join(';');}).join('\r\n')],{type:'text/csv;charset=utf-8;'});
-    var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=cv.substring(0,9).trim()+' - '+dp+'.csv';
+    /* Fix: normaliza acentos e remove caracteres inválidos em nomes de arquivo antes do download */
+    var safeNome=cv.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-zA-Z0-9 _-]/g,'').substring(0,20).trim();
+    var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=safeNome+' - '+dp+'.csv';
     document.body.appendChild(a);a.click();setTimeout(function(){document.body.removeChild(a);URL.revokeObjectURL(a.href);},200);
 }
 
@@ -1154,15 +1160,18 @@ function esc_html(s) {
     return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 function updateTable(){
-    var tbody=document.querySelector('#records-table tbody');tbody.innerHTML='';
+    var tbody=document.querySelector('#records-table tbody');
     var dataAt=document.getElementById('data-atividade').value||'';
     var blocks=Array.from(document.querySelectorAll('.block')).sort(function(a,b){return parseFloat(a.dataset.xPct)-parseFloat(b.dataset.xPct);});
+    /* PERF-01: acumula HTML numa string e seta innerHTML uma única vez — evita refluxo a cada linha */
+    var html='';
     blocks.forEach(function(b){
         var d=blockDataMap[b.id]||{},x=parseFloat(b.dataset.xPct),w=parseFloat(b.style.width),iv=b.dataset.type==='v';
         /* SEC: esc_html em todos os campos originados do Excel/usuário */
         var razaoSafe=esc_html(d.razao),cnpjSafe=esc_html(d.cnpj),tipoSafe=esc_html(d.visitaTipo),acSafe=esc_html(d.acompCargo),cnNome=esc_html(d.contatoNome),cnCargo=esc_html(d.contatoCargo),comSafe=esc_html(d.comentario),proxSafe=esc_html(d.proximo),nameSafe=esc_html(b.dataset.name);
-        tbody.innerHTML+='<tr><td class="td-nowrap">'+dataAt+'</td><td class="td-nowrap"><b>'+calcTime(x)+' - '+calcTime(x+w)+'</b></td><td class="td-nowrap">'+Math.round((w/100)*T)+' min</td><td class="td-nowrap">'+(iv?'VISITA':'AUSÊNCIA')+'</td><td>'+(iv?(razaoSafe?('<b>'+razaoSafe+'</b>'):warn('','Cliente não selecionado')):('<b>'+nameSafe+'</b>'))+'</td><td class="td-nowrap">'+(iv?warn(cnpjSafe,'CNPJ obrigatório'):'')+'</td><td class="td-nowrap">'+(iv?warn(tipoSafe,'Modalidade obrigatória'):'')+'</td><td class="td-left">'+(iv?(acSafe||'Não Acompanhado(a)'):'')+'</td><td class="td-left">'+(iv?warn(cnNome,'Nome do contato obrigatório'):'')+'</td><td class="td-left">'+(iv?warn(cnCargo,'Cargo do contato obrigatório'):'')+'</td><td class="td-left">'+(iv?warn(comSafe,'Comentário obrigatório'):warn(comSafe,'Justificativa obrigatória'))+'</td><td class="td-left">'+(iv?warn(proxSafe,'Objetivo obrigatório'):'')+'</td></tr>';
+        html+='<tr><td class="td-nowrap">'+dataAt+'</td><td class="td-nowrap"><b>'+calcTime(x)+' - '+calcTime(x+w)+'</b></td><td class="td-nowrap">'+Math.round((w/100)*T)+' min</td><td class="td-nowrap">'+(iv?'VISITA':'AUSÊNCIA')+'</td><td>'+(iv?(razaoSafe?('<b>'+razaoSafe+'</b>'):warn('','Cliente não selecionado')):('<b>'+nameSafe+'</b>'))+'</td><td class="td-nowrap">'+(iv?warn(cnpjSafe,'CNPJ obrigatório'):'')+'</td><td class="td-nowrap">'+(iv?warn(tipoSafe,'Modalidade obrigatória'):'')+'</td><td class="td-left">'+(iv?(acSafe||'Não Acompanhado(a)'):'')+'</td><td class="td-left">'+(iv?warn(cnNome,'Nome do contato obrigatório'):'')+'</td><td class="td-left">'+(iv?warn(cnCargo,'Cargo do contato obrigatório'):'')+'</td><td class="td-left">'+(iv?warn(comSafe,'Comentário obrigatório'):warn(comSafe,'Justificativa obrigatória'))+'</td><td class="td-left">'+(iv?warn(proxSafe,'Objetivo obrigatório'):'')+'</td></tr>';
     });
+    tbody.innerHTML=html;
     var ok=blocks.length>0&&!tbody.querySelectorAll('.warn-icon').length&&!!document.getElementById('consultor-select').value&&!!document.getElementById('data-atividade').value;
     var ba=document.getElementById('btn-export-admin'),bc=document.getElementById('btn-export');
     if(ba)ba.disabled=!ok; if(bc)bc.disabled=!ok;
@@ -1184,22 +1193,14 @@ function updateShelfBadges() {
         var mins = Math.round((w/100)*T);
         totals[name] = (totals[name]||0) + mins;
     });
+    /* PERF-05: compara via data-name do lib-item (valor exato, sem emoji) em vez de textContent */
     document.querySelectorAll('.lib-item').forEach(function(item){
-        var name = item.querySelector('.lib-item-label') ? item.querySelector('.lib-item-label').textContent.trim() : item.textContent.trim();
         var badge = item.querySelector('.lib-time-badge');
         if(!badge) return;
-        var matched = null;
-        var normName = normalizeStr(name);
-        Object.keys(totals).forEach(function(k){
-            var normK = normalizeStr(k);
-            if(normName.indexOf(normK)!==-1 || normK.indexOf(normName)!==-1) matched=k;
-        });
-        if(!matched) {
-            var txt = item.querySelector('.lib-item-label') ? normalizeStr(item.querySelector('.lib-item-label').textContent) : '';
-            Object.keys(totals).forEach(function(k){ if(txt.includes(normalizeStr(k))) matched=k; });
-        }
-        if(matched && totals[matched]>0){
-            badge.textContent = minToHHMM(totals[matched]);
+        var dataName = item.dataset.name || '';
+        var mins = dataName && totals[dataName] ? totals[dataName] : 0;
+        if(mins > 0){
+            badge.textContent = minToHHMM(mins);
             badge.classList.add('active');
         } else {
             badge.textContent='';

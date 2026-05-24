@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-br"><head>
+<html lang="pt-br" style=""><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
@@ -11,7 +11,7 @@
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&amp;display=swap" rel="stylesheet">
-    <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+    
     <style>
         /* ── VARIÁVEIS ── */
         :root {
@@ -357,16 +357,16 @@
             <div class="lib-item c-a1" data-type="a" data-dur="600" data-name="Feriado local" data-fixed="1"><span class="lib-item-label">🗓️ Feriado local</span><span class="lib-time-badge"></span></div>
             <div class="lib-item c-a1" data-type="a" data-dur="60" data-name="Licença Médica"><span class="lib-item-label">🩹 Licença Médica</span><span class="lib-time-badge"></span></div>
         </div>
-        <div class="category"><div class="cat-title">AUSÊNCIA : ATIVIDADES CORPORATIVAS</div>
+        <div class="category"><div class="cat-title">ATIVIDADES CORPORATIVAS</div>
             <div class="lib-item c-a2" data-type="a" data-dur="60" data-name="Home office"><span class="lib-item-label">🏠 Home office</span><span class="lib-time-badge"></span></div>
             <div class="lib-item c-a2" data-type="a" data-dur="60" data-name="Reuniões"><span class="lib-item-label">👥 Reuniões</span><span class="lib-time-badge"></span></div>
             <div class="lib-item c-a2" data-type="a" data-dur="60" data-name="Treinamento"><span class="lib-item-label">📚 Treinamento</span><span class="lib-time-badge"></span></div>
         </div>
-        <div class="category"><div class="cat-title">AUSÊNCIA : ATIVIDADES ESTRATÉGICAS</div>
+        <div class="category"><div class="cat-title">ATIVIDADES ESTRATÉGICAS</div>
             <div class="lib-item c-a3" data-type="a" data-dur="60" data-name="Congressos"><span class="lib-item-label">🌍 Congressos</span><span class="lib-time-badge"></span></div>
             <div class="lib-item c-a3" data-type="a" data-dur="60" data-name="Eventos"><span class="lib-item-label">🎟️ Eventos</span><span class="lib-time-badge"></span></div>
         </div>
-        <div class="category"><div class="cat-title">AUSÊNCIA : ATIVIDADE DE CAMPO</div>
+        <div class="category"><div class="cat-title">ATIVIDADES DE CAMPO</div>
             <div class="lib-item c-a4" data-type="a" data-dur="60" data-name="Deslocamento"><span class="lib-item-label">🚗 Deslocamento</span><span class="lib-time-badge"></span></div>
             <div class="lib-item c-a4" data-type="a" data-dur="60" data-name="Tempo de espera"><span class="lib-item-label">⏳ Tempo de espera</span><span class="lib-time-badge"></span></div>
         </div>
@@ -477,8 +477,8 @@
 <div id="modal-a" class="modal-overlay">
     <div class="modal-content" style="width:500px;max-width:95vw;">
         <button class="modal-close" onclick="closeModal()">✕</button>
-        <div class="form-group"><label>Tipo de Ausência</label><input type="text" id="a-name-display" readonly=""></div>
-        <div class="form-group" style="margin-top:15px"><label>Motivo da Ausência</label><textarea id="a-comentario" style="height:100px" oninput="validateSaveBtnA()"></textarea></div>
+        <div class="form-group"><label id="a-label-tipo">Tipo de Ausência</label><input type="text" id="a-name-display" readonly=""></div>
+        <div class="form-group" style="margin-top:15px"><label id="a-label-motivo">Motivo da Ausência</label><textarea id="a-comentario" style="height:100px" oninput="validateSaveBtnA()"></textarea></div>
         <div class="modal-actions">
             <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
             <button class="btn-save" id="btn-save-a" onclick="saveData()" disabled="">Salvar</button>
@@ -854,6 +854,8 @@ async function generateConsultantClone() {
         var inj = '<script>(function(){var d=' + payload + ';window.IS_CLONE=d.IS_CLONE;window.EMBED_DATA=d.EMBED_DATA;window.CLONE_SCRIPT_URL=d.CLONE_SCRIPT_URL;window.TEAM_AUTH=d.TEAM_AUTH;})();<\/script>';
         var html = document.documentElement.outerHTML;
         html = html.replace(/(<button[^>]*id=["']btn-generate-clone["'][^>]*>[\s\S]*?<\/button>)/gi, '');
+        /* PERF: remove SheetJS do clone — não é usado pelo consultor (sem leitura de Excel) */
+        html = html.replace(/<script src="https:\/\/cdn\.sheetjs\.com[^"]*"><\/script>/gi, '');
         html = html.replace(/<body[^>]*>/i, function(m) { return m + inj; });
         var blob = new Blob(['<!DOCTYPE html>\n' + html], {type:'text/html'});
         var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'index.html';
@@ -1012,6 +1014,11 @@ function openModal(id) {
         document.getElementById('modal-a').style.display='flex';
         document.getElementById('a-name-display').value=el.dataset.name; document.getElementById('a-comentario').value=data.comentario||'';
         document.getElementById('btn-save-a').disabled=!data.comentario;
+        /* Labels dinâmicos: grupos Corporativas/Estratégicas/Campo usam nomenclatura de Atividade */
+        var ATIVIDADE_NAMES=['Home office','Reuniões','Treinamento','Congressos','Eventos','Deslocamento','Tempo de espera'];
+        var isAtividade=ATIVIDADE_NAMES.indexOf(el.dataset.name)!==-1;
+        document.getElementById('a-label-tipo').textContent=isAtividade?'Tipo de Atividade':'Tipo de Ausência';
+        document.getElementById('a-label-motivo').textContent=isAtividade?'Descrição da Atividade':'Motivo da Ausência';
     }
 }
 function closeModal(){document.querySelectorAll('.modal-overlay').forEach(function(m){m.style.display='none';});}
@@ -1092,10 +1099,10 @@ function clearSelectedClient(){
 }
 function toggleAcompanhante(checked){var inp=document.getElementById('v-acomp-cargo');inp.disabled=!checked;if(!checked)inp.value='';validateSaveBtn();}
 /* Fix #11: guard contra duplo disparo (ex: duplo clique no ×) */
-function removeBlock(id){var el=document.getElementById(id);if(!el)return;el.remove();delete blockDataMap[id];updateTable();updateShelfBadges();}
+function removeBlock(id){var el=document.getElementById(id);if(!el)return;try{interact(el).unset();}catch(e){}el.remove();delete blockDataMap[id];updateTable();updateShelfBadges();}
 function openConfirmClear(){document.getElementById('modal-confirm').style.display='flex';}
 /* Fix #2: fecha apenas o modal de limpar, não todos os overlays */
-function confirmClear(){document.querySelectorAll('.block').forEach(function(b){b.remove();});blockDataMap={};document.getElementById('modal-confirm').style.display='none';updateTable();updateShelfBadges();}
+function confirmClear(){document.querySelectorAll('.block').forEach(function(b){try{interact(b).unset();}catch(e){}b.remove();});blockDataMap={};document.getElementById('modal-confirm').style.display='none';updateTable();updateShelfBadges();}
 
 /* ── ENVIO ── */
 function enviarRegistro(){
@@ -1110,7 +1117,9 @@ async function confirmarEnvio(){
     var blocks=Array.from(document.querySelectorAll('.block')).sort(function(a,b){return parseFloat(a.dataset.xPct)-parseFloat(b.dataset.xPct);});
     var rows=[]; blocks.forEach(function(b){
         var d=blockDataMap[b.id]||{},x=parseFloat(b.dataset.xPct),w=parseFloat(b.style.width),iv=b.dataset.type==='v';
-        rows.push([cv,dat,calcTime(x)+' - '+calcTime(x+w),Math.round((w/100)*T)+' min',iv?'VISITA':'AUSÊNCIA',iv?(d.razao||''):(b.dataset.name||''),iv?(d.cnpj||''):'',iv?(d.visitaTipo||''):'',iv?(d.acompCargo||'Não Acompanhado(a)'):'',iv?(d.contatoNome||''):'',iv?(d.contatoCargo||''):'',d.comentario||'',iv?(d.proximo||''):'' ]);
+        var ATIVIDADE_NAMES_ENV=['Home office','Reuniões','Treinamento','Congressos','Eventos','Deslocamento','Tempo de espera'];
+        var tipoENV=iv?'VISITA':(ATIVIDADE_NAMES_ENV.indexOf(b.dataset.name)!==-1?'ATIVIDADE':'AUSÊNCIA');
+        rows.push([cv,dat,calcTime(x)+' - '+calcTime(x+w),Math.round((w/100)*T)+' min',tipoENV,iv?(d.razao||''):(b.dataset.name||''),iv?(d.cnpj||''):'',iv?(d.visitaTipo||''):'',iv?(d.acompCargo||'Não Acompanhado(a)'):'',iv?(d.contatoNome||''):'',iv?(d.contatoCargo||''):'',d.comentario||'',iv?(d.proximo||''):'' ]);
     });
     var fb=document.getElementById('send-feedback'),btn=document.getElementById('btn-export');
     fb.className='send-feedback sending';fb.innerHTML='<span class="spin">⟳</span> Enviando...';btn.disabled=true;
@@ -1170,7 +1179,9 @@ function exportCSV(){
         var d=blockDataMap[b.id]||{},x=parseFloat(b.dataset.xPct),w=parseFloat(b.style.width),iv=b.dataset.type==='v';
         /* Fix #6: CNPJ sem apóstrofo — a função esc() já envolve em aspas se necessário,
            garantindo consistência com o dado enviado ao Google Sheets */
-        rows.push([cv,dv,calcTime(x)+' - '+calcTime(x+w),Math.round((w/100)*T)+' min',iv?'VISITA':'AUSÊNCIA',iv?(d.razao||''):(b.dataset.name||''),iv?(d.cnpj||''):'',iv?(d.visitaTipo||''):'',iv?(d.acompCargo||'Não Acompanhado(a)'):'',iv?(d.contatoNome||''):'',iv?(d.contatoCargo||''):'',d.comentario||'',iv?(d.proximo||''):'' ]);
+        var ATIVIDADE_NAMES_CSV=['Home office','Reuniões','Treinamento','Congressos','Eventos','Deslocamento','Tempo de espera'];
+        var tipoCSV=iv?'VISITA':(ATIVIDADE_NAMES_CSV.indexOf(b.dataset.name)!==-1?'ATIVIDADE':'AUSÊNCIA');
+        rows.push([cv,dv,calcTime(x)+' - '+calcTime(x+w),Math.round((w/100)*T)+' min',tipoCSV,iv?(d.razao||''):(b.dataset.name||''),iv?(d.cnpj||''):'',iv?(d.visitaTipo||''):'',iv?(d.acompCargo||'Não Acompanhado(a)'):'',iv?(d.contatoNome||''):'',iv?(d.contatoCargo||''):'',d.comentario||'',iv?(d.proximo||''):'' ]);
     });
     /* Fix #6: CNPJ (14 dígitos numéricos) recebe prefixo ="..." para forçar texto no Excel
        sem o apóstrofo visível que causava inconsistência com o dado do Google Sheets */
@@ -1202,7 +1213,10 @@ function updateTable(){
         var d=blockDataMap[b.id]||{},x=parseFloat(b.dataset.xPct),w=parseFloat(b.style.width),iv=b.dataset.type==='v';
         /* SEC: esc_html em todos os campos originados do Excel/usuário */
         var razaoSafe=esc_html(d.razao),cnpjSafe=esc_html(d.cnpj),tipoSafe=esc_html(d.visitaTipo),acSafe=esc_html(d.acompCargo),cnNome=esc_html(d.contatoNome),cnCargo=esc_html(d.contatoCargo),comSafe=esc_html(d.comentario),proxSafe=esc_html(d.proximo),nameSafe=esc_html(b.dataset.name);
-        html+='<tr><td class="td-nowrap">'+dataAt+'</td><td class="td-nowrap"><b>'+calcTime(x)+' - '+calcTime(x+w)+'</b></td><td class="td-nowrap">'+Math.round((w/100)*T)+' min</td><td class="td-nowrap">'+(iv?'VISITA':'AUSÊNCIA')+'</td><td>'+(iv?(razaoSafe?('<b>'+razaoSafe+'</b>'):warn('','Cliente não selecionado')):('<b>'+nameSafe+'</b>'))+'</td><td class="td-nowrap">'+(iv?warn(cnpjSafe,'CNPJ obrigatório'):'')+'</td><td class="td-nowrap">'+(iv?warn(tipoSafe,'Modalidade obrigatória'):'')+'</td><td class="td-left">'+(iv?(acSafe||'Não Acompanhado(a)'):'')+'</td><td class="td-left">'+(iv?warn(cnNome,'Nome do contato obrigatório'):'')+'</td><td class="td-left">'+(iv?warn(cnCargo,'Cargo do contato obrigatório'):'')+'</td><td class="td-left">'+(iv?warn(comSafe,'Comentário obrigatório'):warn(comSafe,'Justificativa obrigatória'))+'</td><td class="td-left">'+(iv?warn(proxSafe,'Objetivo obrigatório'):'')+'</td></tr>';
+        /* TIPO dinâmico: grupos Corporativas/Estratégicas/Campo exibem "ATIVIDADE" */
+        var ATIVIDADE_NAMES_T=['Home office','Reuniões','Treinamento','Congressos','Eventos','Deslocamento','Tempo de espera'];
+        var tipoLabel=iv?'VISITA':(ATIVIDADE_NAMES_T.indexOf(b.dataset.name)!==-1?'ATIVIDADE':'AUSÊNCIA');
+        html+='<tr><td class="td-nowrap">'+dataAt+'</td><td class="td-nowrap"><b>'+calcTime(x)+' - '+calcTime(x+w)+'</b></td><td class="td-nowrap">'+Math.round((w/100)*T)+' min</td><td class="td-nowrap">'+tipoLabel+'</td><td>'+(iv?(razaoSafe?('<b>'+razaoSafe+'</b>'):warn('','Cliente não selecionado')):('<b>'+nameSafe+'</b>'))+'</td><td class="td-nowrap">'+(iv?warn(cnpjSafe,'CNPJ obrigatório'):'')+'</td><td class="td-nowrap">'+(iv?warn(tipoSafe,'Modalidade obrigatória'):'')+'</td><td class="td-left">'+(iv?(acSafe||'Não Acompanhado(a)'):'')+'</td><td class="td-left">'+(iv?warn(cnNome,'Nome do contato obrigatório'):'')+'</td><td class="td-left">'+(iv?warn(cnCargo,'Cargo do contato obrigatório'):'')+'</td><td class="td-left">'+(iv?warn(comSafe,'Comentário obrigatório'):warn(comSafe,'Justificativa obrigatória'))+'</td><td class="td-left">'+(iv?warn(proxSafe,'Objetivo obrigatório'):'')+'</td></tr>';
     });
     tbody.innerHTML=html;
     var ok=blocks.length>0&&!tbody.querySelectorAll('.warn-icon').length&&!!document.getElementById('consultor-select').value&&!!document.getElementById('data-atividade').value;
@@ -1248,4 +1262,4 @@ function updateShelfBadges() {
       <span class="flatpickr-weekday">
         Dom</span><span class="flatpickr-weekday">Seg</span><span class="flatpickr-weekday">Ter</span><span class="flatpickr-weekday">Qua</span><span class="flatpickr-weekday">Qui</span><span class="flatpickr-weekday">Sex</span><span class="flatpickr-weekday">Sáb
       </span>
-      </div></div><div class="flatpickr-days" tabindex="-1"><div class="dayContainer"><span class="flatpickr-day prevMonthDay" aria-label="Abril 26, 2026" tabindex="-1">26</span><span class="flatpickr-day prevMonthDay" aria-label="Abril 27, 2026" tabindex="-1">27</span><span class="flatpickr-day prevMonthDay" aria-label="Abril 28, 2026" tabindex="-1">28</span><span class="flatpickr-day prevMonthDay" aria-label="Abril 29, 2026" tabindex="-1">29</span><span class="flatpickr-day prevMonthDay" aria-label="Abril 30, 2026" tabindex="-1">30</span><span class="flatpickr-day" aria-label="Maio 1, 2026" tabindex="-1">1</span><span class="flatpickr-day" aria-label="Maio 2, 2026" tabindex="-1">2</span><span class="flatpickr-day" aria-label="Maio 3, 2026" tabindex="-1">3</span><span class="flatpickr-day" aria-label="Maio 4, 2026" tabindex="-1">4</span><span class="flatpickr-day" aria-label="Maio 5, 2026" tabindex="-1">5</span><span class="flatpickr-day" aria-label="Maio 6, 2026" tabindex="-1">6</span><span class="flatpickr-day" aria-label="Maio 7, 2026" tabindex="-1">7</span><span class="flatpickr-day" aria-label="Maio 8, 2026" tabindex="-1">8</span><span class="flatpickr-day" aria-label="Maio 9, 2026" tabindex="-1">9</span><span class="flatpickr-day" aria-label="Maio 10, 2026" tabindex="-1">10</span><span class="flatpickr-day" aria-label="Maio 11, 2026" tabindex="-1">11</span><span class="flatpickr-day" aria-label="Maio 12, 2026" tabindex="-1">12</span><span class="flatpickr-day" aria-label="Maio 13, 2026" tabindex="-1">13</span><span class="flatpickr-day" aria-label="Maio 14, 2026" tabindex="-1">14</span><span class="flatpickr-day" aria-label="Maio 15, 2026" tabindex="-1">15</span><span class="flatpickr-day" aria-label="Maio 16, 2026" tabindex="-1">16</span><span class="flatpickr-day" aria-label="Maio 17, 2026" tabindex="-1">17</span><span class="flatpickr-day" aria-label="Maio 18, 2026" tabindex="-1">18</span><span class="flatpickr-day" aria-label="Maio 19, 2026" tabindex="-1">19</span><span class="flatpickr-day" aria-label="Maio 20, 2026" tabindex="-1">20</span><span class="flatpickr-day today selected" aria-label="Maio 21, 2026" aria-current="date" tabindex="-1">21</span><span class="flatpickr-day" aria-label="Maio 22, 2026" tabindex="-1">22</span><span class="flatpickr-day" aria-label="Maio 23, 2026" tabindex="-1">23</span><span class="flatpickr-day" aria-label="Maio 24, 2026" tabindex="-1">24</span><span class="flatpickr-day" aria-label="Maio 25, 2026" tabindex="-1">25</span><span class="flatpickr-day" aria-label="Maio 26, 2026" tabindex="-1">26</span><span class="flatpickr-day" aria-label="Maio 27, 2026" tabindex="-1">27</span><span class="flatpickr-day" aria-label="Maio 28, 2026" tabindex="-1">28</span><span class="flatpickr-day" aria-label="Maio 29, 2026" tabindex="-1">29</span><span class="flatpickr-day" aria-label="Maio 30, 2026" tabindex="-1">30</span><span class="flatpickr-day" aria-label="Maio 31, 2026" tabindex="-1">31</span><span class="flatpickr-day nextMonthDay" aria-label="Junho 1, 2026" tabindex="-1">1</span><span class="flatpickr-day nextMonthDay" aria-label="Junho 2, 2026" tabindex="-1">2</span><span class="flatpickr-day nextMonthDay" aria-label="Junho 3, 2026" tabindex="-1">3</span><span class="flatpickr-day nextMonthDay" aria-label="Junho 4, 2026" tabindex="-1">4</span><span class="flatpickr-day nextMonthDay" aria-label="Junho 5, 2026" tabindex="-1">5</span><span class="flatpickr-day nextMonthDay" aria-label="Junho 6, 2026" tabindex="-1">6</span></div></div></div></div></div></body></html>
+      </div></div><div class="flatpickr-days" tabindex="-1"><div class="dayContainer"><span class="flatpickr-day prevMonthDay" aria-label="Abril 26, 2026" tabindex="-1">26</span><span class="flatpickr-day prevMonthDay" aria-label="Abril 27, 2026" tabindex="-1">27</span><span class="flatpickr-day prevMonthDay" aria-label="Abril 28, 2026" tabindex="-1">28</span><span class="flatpickr-day prevMonthDay" aria-label="Abril 29, 2026" tabindex="-1">29</span><span class="flatpickr-day prevMonthDay" aria-label="Abril 30, 2026" tabindex="-1">30</span><span class="flatpickr-day" aria-label="Maio 1, 2026" tabindex="-1">1</span><span class="flatpickr-day" aria-label="Maio 2, 2026" tabindex="-1">2</span><span class="flatpickr-day" aria-label="Maio 3, 2026" tabindex="-1">3</span><span class="flatpickr-day" aria-label="Maio 4, 2026" tabindex="-1">4</span><span class="flatpickr-day" aria-label="Maio 5, 2026" tabindex="-1">5</span><span class="flatpickr-day" aria-label="Maio 6, 2026" tabindex="-1">6</span><span class="flatpickr-day" aria-label="Maio 7, 2026" tabindex="-1">7</span><span class="flatpickr-day" aria-label="Maio 8, 2026" tabindex="-1">8</span><span class="flatpickr-day" aria-label="Maio 9, 2026" tabindex="-1">9</span><span class="flatpickr-day" aria-label="Maio 10, 2026" tabindex="-1">10</span><span class="flatpickr-day" aria-label="Maio 11, 2026" tabindex="-1">11</span><span class="flatpickr-day" aria-label="Maio 12, 2026" tabindex="-1">12</span><span class="flatpickr-day" aria-label="Maio 13, 2026" tabindex="-1">13</span><span class="flatpickr-day" aria-label="Maio 14, 2026" tabindex="-1">14</span><span class="flatpickr-day" aria-label="Maio 15, 2026" tabindex="-1">15</span><span class="flatpickr-day" aria-label="Maio 16, 2026" tabindex="-1">16</span><span class="flatpickr-day" aria-label="Maio 17, 2026" tabindex="-1">17</span><span class="flatpickr-day" aria-label="Maio 18, 2026" tabindex="-1">18</span><span class="flatpickr-day" aria-label="Maio 19, 2026" tabindex="-1">19</span><span class="flatpickr-day" aria-label="Maio 20, 2026" tabindex="-1">20</span><span class="flatpickr-day" aria-label="Maio 21, 2026" tabindex="-1">21</span><span class="flatpickr-day" aria-label="Maio 22, 2026" tabindex="-1">22</span><span class="flatpickr-day" aria-label="Maio 23, 2026" tabindex="-1">23</span><span class="flatpickr-day today selected" aria-label="Maio 24, 2026" aria-current="date" tabindex="-1">24</span><span class="flatpickr-day" aria-label="Maio 25, 2026" tabindex="-1">25</span><span class="flatpickr-day" aria-label="Maio 26, 2026" tabindex="-1">26</span><span class="flatpickr-day" aria-label="Maio 27, 2026" tabindex="-1">27</span><span class="flatpickr-day" aria-label="Maio 28, 2026" tabindex="-1">28</span><span class="flatpickr-day" aria-label="Maio 29, 2026" tabindex="-1">29</span><span class="flatpickr-day" aria-label="Maio 30, 2026" tabindex="-1">30</span><span class="flatpickr-day" aria-label="Maio 31, 2026" tabindex="-1">31</span><span class="flatpickr-day nextMonthDay" aria-label="Junho 1, 2026" tabindex="-1">1</span><span class="flatpickr-day nextMonthDay" aria-label="Junho 2, 2026" tabindex="-1">2</span><span class="flatpickr-day nextMonthDay" aria-label="Junho 3, 2026" tabindex="-1">3</span><span class="flatpickr-day nextMonthDay" aria-label="Junho 4, 2026" tabindex="-1">4</span><span class="flatpickr-day nextMonthDay" aria-label="Junho 5, 2026" tabindex="-1">5</span><span class="flatpickr-day nextMonthDay" aria-label="Junho 6, 2026" tabindex="-1">6</span></div></div></div></div></div></body></html>

@@ -1124,7 +1124,14 @@ function searchClient(q){
     var wrap=document.getElementById('client-results-wrap'),tbody=document.getElementById('client-results-body'),noRes=document.getElementById('no-results-msg');
     var term=q.trim().toLowerCase(); if(term.length<2){wrap.style.display='none';return;}
     /* PERF-02: usa _search pré-indexado — evita 6 toLowerCase() por registro a cada busca */
-    var list=CLIENT_DB.filter(function(c){ return c._search ? c._search.includes(term) : (c.cnpj+' '+c.razao+' '+c.endereco+' '+c.bairro+' '+c.cidade+' '+c.uf).toLowerCase().includes(term); }).slice(0,50);
+    var list=CLIENT_DB.filter(function(c){ return c._search ? c._search.includes(term) : (c.cnpj+' '+c.razao+' '+c.endereco+' '+c.bairro+' '+c.cidade+' '+c.uf).toLowerCase().includes(term); })
+        .sort(function(a,b){
+            return (a.uf||'').localeCompare(b.uf||'','pt-BR')||
+                   (a.cidade||'').localeCompare(b.cidade||'','pt-BR')||
+                   (a.bairro||'').localeCompare(b.bairro||'','pt-BR')||
+                   (a.razao||'').localeCompare(b.razao||'','pt-BR')||
+                   (a.cnpj||'').localeCompare(b.cnpj||'','pt-BR');
+        }).slice(0,50);
     tbody.innerHTML=''; noRes.style.display='none';
     if(!list.length){noRes.style.display='block';wrap.style.display='block';return;}
     /* PERF-04: compila o RegExp uma única vez para todos os 50 resultados × 6 campos */

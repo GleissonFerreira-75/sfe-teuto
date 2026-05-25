@@ -743,6 +743,7 @@ var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyI1XTF3Au09tI1Mb
 var CLIENT_DB = [], TEAM_DB = [], selectedClient = null;
 var _fileEquipe = null, _fileClientes = null;
 var blockDataMap = {}, currentEditingId = null;
+var _fpInstance = null; /* instância Flatpickr — global para doLogin poder chamar redraw() */
 
 /* ── MANUAL ── */
 function openManual() {
@@ -883,6 +884,9 @@ async function doLogin() {
     if (!match) { errEl.textContent = 'E-mail ou senha inválidos.'; document.getElementById('login-senha').value = ''; document.getElementById('login-senha').focus(); return; }
     document.getElementById('login-screen').style.display = 'none';
     var s = document.getElementById('consultor-select'); s.value = match.nome; s.disabled = true; updateTable();
+    /* Redesenha o calendário após login: neste momento o consultor está identificado
+       e o onDayCreate pode ler o localStorage correto para marcar os dias enviados */
+    if(_fpInstance) _fpInstance.redraw();
 }
 
 /* ── DOM READY ── */
@@ -933,7 +937,7 @@ window.addEventListener('DOMContentLoaded', function() {
         var d=dateObj, dd=('0'+(d.getDate())).slice(-2), mm=('0'+(d.getMonth()+1)).slice(-2), yyyy=d.getFullYear();
         return dd+'/'+mm+'/'+yyyy;
     }
-    var _fpInstance=flatpickr("#data-atividade",{
+    _fpInstance=flatpickr("#data-atividade",{
         locale:"pt", dateFormat:"d/m/Y", defaultDate:"today", disableMobile:"true", monthSelectorType:"static",
         onChange:function(){updateTable();},
         onDayCreate:function(_dObj,_dStr,_fp,dayElem){

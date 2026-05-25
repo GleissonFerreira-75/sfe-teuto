@@ -1202,6 +1202,9 @@ async function confirmarEnvio(){
                     localStorage.setItem(_lsKey, JSON.stringify(_stored));
                 }
             } catch(e){ /* localStorage indisponível — segue normalmente */ }
+            /* Redesenha o calendário imediatamente para exibir o ponto verde
+               no dia recém-enviado — sem precisar navegar de mês e voltar */
+            try{ if(_fpInstance) _fpInstance.redraw(); }catch(e){}
             /* ────────────────────────────────────────────────────────────────────────── */
             setTimeout(function(){confirmClear();fb.className='send-feedback';fb.innerHTML='';},2500);
         } else {

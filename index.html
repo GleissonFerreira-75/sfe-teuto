@@ -177,10 +177,8 @@
         .dup-modal .dup-msg{font-size:13px;color:var(--subtitle);line-height:1.6;margin:0 0 6px;}
         .dup-modal .dup-date{font-size:1rem;font-weight:800;color:var(--text);margin:8px 0 18px;}
         .dup-modal .dup-sub{font-size:11px;color:var(--subtitle);margin-bottom:22px;line-height:1.5;}
-        .btn-dup-fix{flex:1;padding:14px;background:var(--accent);color:white;border:none;border-radius:8px;cursor:pointer;font-weight:800;font-size:12px;text-transform:uppercase;}
+        .btn-dup-fix{padding:14px 40px;background:var(--accent);color:white;border:none;border-radius:8px;cursor:pointer;font-weight:800;font-size:12px;text-transform:uppercase;}
         .btn-dup-fix:hover{opacity:.85;}
-        .btn-dup-cancel{flex:1;padding:14px;background:#7f1d1d;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:800;font-size:12px;text-transform:uppercase;}
-        .btn-dup-cancel:hover{opacity:.85;}
 
         /* ── SETUP ── */
         #setup-screen{position:fixed;top:0;left:0;width:100%;height:100%;background:var(--bg);z-index:9000;display:flex;align-items:center;justify-content:center;}
@@ -528,9 +526,8 @@
         <p class="dup-msg">As atividades do dia</p>
         <p class="dup-date" id="dup-data-display"></p>
         <p class="dup-sub">já foram enviadas para a base de dados.<br>Enviar novamente causará <strong style="color:var(--warning)">duplicidade de registros</strong>.</p>
-        <div class="confirm-btns">
+        <div style="display:flex;justify-content:center;margin-top:4px;">
             <button class="btn-dup-fix" onclick="dupCorrigirData()">📅 Corrigir Data</button>
-            <button class="btn-dup-cancel" onclick="dupCancelarRegistro()">🗑️ Cancelar Registro</button>
         </div>
     </div>
 </div>
@@ -1213,11 +1210,6 @@ function enviarRegistro(){
 function dupCorrigirData(){
     document.getElementById('modal-dia-duplicado').style.display='none';
     try{ if(_fpInstance) _fpInstance.open(); } catch(e) {}
-}
-/* Fecha o alerta e limpa a timeline (mesmo comportamento do botão Limpar) */
-function dupCancelarRegistro(){
-    document.getElementById('modal-dia-duplicado').style.display='none';
-    confirmClear();
 }
 async function confirmarEnvio(){
     /* Fix #1: fecha apenas o modal de confirmação de envio, não todos os overlays */

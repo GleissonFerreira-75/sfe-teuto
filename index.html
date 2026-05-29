@@ -170,6 +170,18 @@
         .radio-option{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;color:var(--text);}
         .radio-option input[type=radio]{accent-color:var(--accent);width:16px;height:16px;cursor:pointer;}
 
+        /* ── MODAL DIA DUPLICADO ── */
+        .dup-modal{width:460px;text-align:center;padding:35px;border-radius:12px;background:var(--card);border:2px solid var(--warning);}
+        .dup-modal .dup-icon{font-size:2.4rem;margin-bottom:12px;}
+        .dup-modal h3{margin:0 0 10px;font-size:1.1rem;color:var(--warning);}
+        .dup-modal .dup-msg{font-size:13px;color:var(--subtitle);line-height:1.6;margin:0 0 6px;}
+        .dup-modal .dup-date{font-size:1rem;font-weight:800;color:var(--text);margin:8px 0 18px;}
+        .dup-modal .dup-sub{font-size:11px;color:var(--subtitle);margin-bottom:22px;line-height:1.5;}
+        .btn-dup-fix{flex:1;padding:14px;background:var(--accent);color:white;border:none;border-radius:8px;cursor:pointer;font-weight:800;font-size:12px;text-transform:uppercase;}
+        .btn-dup-fix:hover{opacity:.85;}
+        .btn-dup-cancel{flex:1;padding:14px;background:#7f1d1d;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:800;font-size:12px;text-transform:uppercase;}
+        .btn-dup-cancel:hover{opacity:.85;}
+
         /* ── SETUP ── */
         #setup-screen{position:fixed;top:0;left:0;width:100%;height:100%;background:var(--bg);z-index:9000;display:flex;align-items:center;justify-content:center;}
         .setup-box{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:40px;width:560px;}
@@ -502,6 +514,23 @@
         <div class="confirm-btns">
             <button class="btn-yes" style="background:var(--success)" onclick="confirmarEnvio()">Confirmar Envio</button>
             <button class="btn-no" onclick="closeModal()">Cancelar</button>
+        </div>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     MODAL DIA DUPLICADO
+══════════════════════════════════════════════ -->
+<div id="modal-dia-duplicado" class="modal-overlay overlay-clear">
+    <div class="dup-modal">
+        <div class="dup-icon">⚠️</div>
+        <h3>Data Já Reportada</h3>
+        <p class="dup-msg">As atividades do dia</p>
+        <p class="dup-date" id="dup-data-display"></p>
+        <p class="dup-sub">já foram enviadas para a base de dados.<br>Enviar novamente causará <strong style="color:var(--warning)">duplicidade de registros</strong>.</p>
+        <div class="confirm-btns">
+            <button class="btn-dup-fix" onclick="dupCorrigirData()">📅 Corrigir Data</button>
+            <button class="btn-dup-cancel" onclick="dupCancelarRegistro()">🗑️ Cancelar Registro</button>
         </div>
     </div>
 </div>
@@ -1163,8 +1192,32 @@ function confirmClear(){document.querySelectorAll('.block').forEach(function(b){
 /* ── ENVIO ── */
 function enviarRegistro(){
     var consultor=document.getElementById('consultor-select').value||'', data=document.getElementById('data-atividade').value||'', qtd=document.querySelectorAll('.block').length;
+    /* ── GUARDA ANTI-DUPLICIDADE: verifica se esta data já foi enviada ── */
+    try {
+        if(consultor && data) {
+            var _lsKey='teuto_sent_'+consultor.toLowerCase().replace(/[^a-z0-9]/g,'_');
+            var _stored=[];
+            try{ _stored=JSON.parse(localStorage.getItem(_lsKey)||'[]'); }catch(e){ _stored=[]; }
+            if(Array.isArray(_stored) && _stored.indexOf(data)!==-1) {
+                document.getElementById('dup-data-display').textContent=data;
+                document.getElementById('modal-dia-duplicado').style.display='flex';
+                return; /* interrompe — não abre o modal de confirmação */
+            }
+        }
+    } catch(e) { /* localStorage indisponível — segue normalmente */ }
+    /* ── fluxo normal ── */
     document.getElementById('confirm-consultor').textContent=consultor; document.getElementById('confirm-data').textContent=data; document.getElementById('confirm-qtd').textContent=qtd+' registro(s) na linha do tempo';
     document.getElementById('modal-confirm-envio').style.display='flex';
+}
+/* Fecha o alerta e foca o campo de data para o consultor corrigir */
+function dupCorrigirData(){
+    document.getElementById('modal-dia-duplicado').style.display='none';
+    try{ if(_fpInstance) _fpInstance.open(); } catch(e) {}
+}
+/* Fecha o alerta e limpa a timeline (mesmo comportamento do botão Limpar) */
+function dupCancelarRegistro(){
+    document.getElementById('modal-dia-duplicado').style.display='none';
+    confirmClear();
 }
 async function confirmarEnvio(){
     /* Fix #1: fecha apenas o modal de confirmação de envio, não todos os overlays */

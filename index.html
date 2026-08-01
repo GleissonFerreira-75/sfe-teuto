@@ -784,12 +784,14 @@ function closeManual() {
 }
 
 /* ── DURAÇÃO EM MINUTOS DO BLOCO ── */
-/* Ajuste solicitado: "Férias" e "Feriado local" preenchem visualmente 08:00–18:00 (100% da timeline),
-   mas o valor em minutos deve refletir 480min (8h de trabalho), abatendo as 2h de almoço embutidas
-   nesse intervalo de 10h. Demais blocos mantêm o cálculo original (proporcional à largura). */
+/* Ajuste solicitado: qualquer bloco que preencha 100% da timeline (08:00–18:00, dia inteiro)
+   preenche visualmente as 10h do expediente, mas seu valor em minutos deve refletir 480min
+   (8h de trabalho), abatendo as 2h de almoço embutidas nesse intervalo — vale para qualquer
+   bloco (Férias, Feriado local, Home office, etc.), não apenas os fixos por nome.
+   Blocos parciais mantêm o cálculo original (proporcional à largura). */
 function getBlockDurationMin(b) {
-    if (b.dataset.name === 'Férias' || b.dataset.name === 'Feriado local') return 480;
     var w = parseFloat(b.style.width);
+    if (w >= 99.9) return 480;
     return Math.round((w / 100) * T);
 }
 
